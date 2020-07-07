@@ -1,4 +1,4 @@
-package com.bankerarea.common;
+package com.bankerarea;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
