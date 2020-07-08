@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTDMapper3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.bankerarea.mapper.IdeaMapper">
+		<select id="getIdeaList" resultType="com.bankerarea.vo.IdeaVO">
+			SELECT *
+			FROM IDEA
+		</select>
+		<select id="getIdea" resultType="com.bankerarea.vo.IdeaVO" parameterType="int">
+			SELECT * 
+			FROM IDEA
+			WHERE IDEA_SEQ = #{idea_seq}
+		</select>
+		<select id="getGoodsList" resultType="com.bankerarea.vo.GoodsVO" parameterType="int">
+			SELECT * 
+			FROM GOODS
+			WHERE IDEA_SEQ = #{idea_seq}
+		</select>
+		<select id="getLikey_count" resultType="int" parameterType="int">
+			SELECT count(*) 
+			FROM LIKEY
+			WHERE IDEA_SEQ = #{idea_seq}
+		</select>
+	</mapper>
+	

@@ -2,12 +2,14 @@ package com.bankerarea.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bankerarea.mapper.UserMapper;
+import com.bankerarea.test.TestVO;
 import com.bankerarea.vo.UserVO;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -30,4 +32,27 @@ public class UserController {
 		
 		return userMapper.signinUser(vo);
 	}
+	
+	/* Test Mapping */
+	@GetMapping("/test/returnUser")
+	public UserVO testReturnUser(){
+		UserVO uvo = new UserVO();
+		
+		uvo.setId("userVO");
+		uvo.setPassword("12345678");
+		uvo.setEmail("user@userVO.com");
+		
+		return uvo;
+	}
+	
+	@GetMapping("/test/returnTest")
+	public TestVO testReturnTest() {
+		TestVO tvo = new TestVO();
+		
+		tvo.setNum(1);
+		tvo.setStr("testVO");
+		
+		return tvo;
+	}
+	
 }
