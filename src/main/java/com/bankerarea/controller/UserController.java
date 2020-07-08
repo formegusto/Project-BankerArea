@@ -1,6 +1,14 @@
 package com.bankerarea.controller;
 
+import java.util.Date;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +26,8 @@ import com.bankerarea.vo.UserVO;
 public class UserController {
 	@Autowired
 	UserMapper userMapper;
+	@Autowired
+	JavaMailSender javaMailSender;
 
 	@PostMapping("/account/signin")
 	public UserVO signinUser(@RequestBody UserVO vo) {
@@ -31,6 +41,17 @@ public class UserController {
 		userMapper.signupUser(vo);
 		
 		return userMapper.signinUser(vo);
+	}
+	
+	@PostMapping("/account/signup/reqsecret")
+	public void reqSecretCode(@RequestBody UserVO user) throws MessagingException {
+		System.out.println(user.getEmail());
+		MimeMessage message = javaMailSender.createMimeMessage();
+		message.setSubject("Hello, We Are BankerArea Team!");
+		message.setRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
+		message.setText("Ur Secret Code is 123456!! :)");
+		message.setSentDate(new Date());
+		javaMailSender.send(message);
 	}
 	
 	/* Test Mapping */
