@@ -6,7 +6,7 @@ import lombok.Data;
 public class GoodsVO {
 	private int goods_seq;
 	private String goods_type;
-	private boolean open_status;
+	private int open_status;
 	private String content;
 	private int price;
 	private int idea_seq;
@@ -23,10 +23,10 @@ public class GoodsVO {
 	public void setGoods_type(String goods_type) {
 		this.goods_type = goods_type;
 	}
-	public boolean isOpen_status() {
+	public int getOpen_status() {
 		return open_status;
 	}
-	public void setOpen_status(boolean open_status) {
+	public void setOpen_status(int open_status) {
 		this.open_status = open_status;
 	}
 	public String getContent() {

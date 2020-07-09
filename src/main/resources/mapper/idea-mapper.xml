@@ -22,5 +22,17 @@
 			FROM LIKEY
 			WHERE IDEA_SEQ = #{idea_seq}
 		</select>
+		<insert id="insertIdea" parameterType="com.bankerarea.vo.IdeaVO">
+			INSERT INTO IDEA(project_name, short_description, category, banker_id) 
+			VALUES(#{project_name}, #{short_description}, #{category}, #{banker_id}) 
+		</insert>
+		<insert id="insertGoods" parameterType="com.bankerarea.vo.GoodsVO">
+			INSERT INTO GOODS(goods_type, open_status, content, price, idea_seq) 
+			VALUES(#{goods_type}, #{open_status}, #{content}, #{price}, #{idea_seq}) 
+		</insert>
+		<select id="getCurrentIdea_seq" resultType="int">
+			SELECT MAX(IDEA_SEQ)
+			FROM IDEA
+		</select>
 	</mapper>
 	

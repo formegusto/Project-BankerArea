@@ -6,6 +6,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bankerarea.common.JwtService;
 import com.bankerarea.mapper.UserMapper;
 import com.bankerarea.test.TestVO;
 import com.bankerarea.vo.UserVO;
@@ -28,11 +30,37 @@ public class UserController {
 	UserMapper userMapper;
 	@Autowired
 	JavaMailSender javaMailSender;
+	@Autowired
+	private JwtService jwtService;
 
 	@PostMapping("/account/signin")
-	public UserVO signinUser(@RequestBody UserVO vo) {
+	public UserVO signinUser(@RequestBody UserVO vo, HttpServletRequest req) {
 		System.out.println("/account/signin ==> " + vo.getId() + "로그인 처리");
-		return userMapper.signinUser(vo);
+		UserVO user = userMapper.signinUser(vo);
+		
+		String jwt = req.getHeader("Authorization");
+		System.out.println(jwt);
+		if(jwt == null) {
+			System.out.println("토큰이 없어요");
+		} else {
+			try {
+				if(jwtService.checkJwt(jwt)) {
+					System.out.println("유효한 토큰 검사 성공");
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("유효한 토큰이 아니에요");
+		}
+		
+		return user;
+	}
+	
+	@PostMapping("/account/token")
+	public String createToken(@RequestBody UserVO vo) throws Exception{
+		System.out.println("토큰 만들기 성공");
+		return jwtService.makeJwt(vo);
 	}
 	
 	@PostMapping("/account/signup")

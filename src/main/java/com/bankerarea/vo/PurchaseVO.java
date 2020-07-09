@@ -4,9 +4,16 @@ import lombok.Data;
 
 @Data
 public class PurchaseVO {
+	private int purchase_seq;
 	private String buyer_id;
 	private int goods_seq;
 	
+	public int getPurchase_seq() {
+		return purchase_seq;
+	}
+	public void setPurchase_seq(int purchase_seq) {
+		this.purchase_seq = purchase_seq;
+	}
 	public String getBuyer_id() {
 		return buyer_id;
 	}

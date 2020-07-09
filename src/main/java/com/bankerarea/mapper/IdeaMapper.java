@@ -13,4 +13,7 @@ public interface IdeaMapper {
 	IdeaVO getIdea(int idea_seq);
 	List<GoodsVO> getGoodsList(int idea_seq);
 	int getLikey_count(int idea_seq);
+	void insertIdea(IdeaVO vo);
+	void insertGoods(GoodsVO vo);
+	int getCurrentIdea_seq();
 }
