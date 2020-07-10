@@ -6,7 +6,9 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -22,7 +24,7 @@ import com.bankerarea.mapper.UserMapper;
 import com.bankerarea.test.TestVO;
 import com.bankerarea.vo.UserVO;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "", maxAge = 3600, allowCredentials="true")
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -33,41 +35,41 @@ public class UserController {
 	@Autowired
 	private JwtService jwtService;
 
-	@PostMapping("/account/signin")
-	public UserVO signinUser(@RequestBody UserVO vo, HttpServletRequest req) {
-		System.out.println("/account/signin ==> " + vo.getId() + "로그인 처리");
+	@GetMapping("/account/token")
+	public UserVO token(UserVO vo, HttpServletResponse res,
+			HttpServletRequest req) throws Exception {
+		System.out.println(vo);
 		UserVO user = userMapper.signinUser(vo);
+		String accessKey = jwtService.makeJwt(vo);
 		
-		String jwt = req.getHeader("Authorization");
-		System.out.println(jwt);
-		if(jwt == null) {
-			System.out.println("토큰이 없어요");
-		} else {
-			try {
-				if(jwtService.checkJwt(jwt)) {
-					System.out.println("유효한 토큰 검사 성공");
-				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			System.out.println("유효한 토큰이 아니에요");
-		}
+		Cookie cookie = new Cookie("accessKey",accessKey);
+		System.out.println(user + accessKey);
+		res.addCookie(cookie);
+		user.setAccessKey(accessKey);
 		
 		return user;
 	}
 	
-	@PostMapping("/account/token")
-	public String createToken(@RequestBody UserVO vo) throws Exception{
-		System.out.println("토큰 만들기 성공");
-		return jwtService.makeJwt(vo);
+	@PostMapping("/account/signin")
+	public UserVO signinUser(@RequestBody UserVO vo, HttpServletResponse res) throws Exception {
+		System.out.println("/account/signin ==> " + vo.getId() + "로그인 처리");
+		
+		UserVO user = userMapper.signinUser(vo);
+		String accessKey = jwtService.makeJwt(vo);
+		
+		Cookie cookie = new Cookie("accessKey", accessKey);
+		cookie.setComment("이게 들어갔으면 좋겠네");
+		cookie.setPath("/");
+		cookie.setMaxAge(60*60*24);
+		res.addCookie(cookie);
+		
+		return user;
 	}
 	
 	@PostMapping("/account/signup")
 	public UserVO signupUser(@RequestBody UserVO vo) {
 		System.out.println("/account/signup ==> " + vo.getId() + "회원가입 처리");
 		userMapper.signupUser(vo);
-		
 		return userMapper.signinUser(vo);
 	}
 	

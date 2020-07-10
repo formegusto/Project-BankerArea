@@ -3,6 +3,7 @@ package com.bankerarea.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,8 +27,10 @@ public class IdeaController {
 	PurchaseMapper purchaseMapper;
 	
 	@GetMapping("/list")
-	public List<IdeaVO> getIdeaList() {
+	public List<IdeaVO> getIdeaList(
+			@CookieValue(name="accessKey",defaultValue = "안들어오는이유좀?") String key) {
 		System.out.println("/idea/list ==> 아이디어 리스트 조회 처리");
+		System.out.println(key);
 		
 		List<IdeaVO> ideaList = ideaMapper.getIdeaList();
 		for(int i=0;i<ideaList.size();i++) {

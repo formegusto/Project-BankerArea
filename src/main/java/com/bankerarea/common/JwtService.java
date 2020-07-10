@@ -24,7 +24,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Service
 public class JwtService {
 
-    private String secretKey = "ThisisHyoJunSecretKeyWelcomeMyFirstJwt";
+    private String secretKey = "ThisisBankerSecretKeyWelcomeMyFirstJwt";
 
     private Logger logger = LoggerFactory.getLogger(JwtService.class);
 
@@ -66,7 +66,7 @@ public class JwtService {
             logger.info("expireTime :" + claims.getExpiration());
             logger.info("id :" + claims.get("id"));
             logger.info("password :" + claims.get("password"));
-
+            
             return true;
         } catch (ExpiredJwtException exception) {
             logger.info("토큰 만료");

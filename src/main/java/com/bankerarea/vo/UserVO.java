@@ -7,6 +7,7 @@ public class UserVO {
 	private String id;
 	private String password;
 	private String email;
+	private String accessKey;
 	
 	public String getId() {
 		return id;
@@ -26,10 +27,16 @@ public class UserVO {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	public String getAccessKey() {
+		return accessKey;
+	}
+	public void setAccessKey(String accessKey) {
+		this.accessKey = accessKey;
+	}
 	
 	@Override
 	public String toString() {
-		return "UserVO [id=" + id + ", password=" + password + ", email=" + email + "]";
+		return "UserVO [id=" + id + ", password=" + password + ", email=" + email + ", accessKey=" + accessKey + "]";
 	}
 	
 }
