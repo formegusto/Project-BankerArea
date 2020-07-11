@@ -11,7 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bankerarea.common.JwtService;
+import com.bankerarea.common.LoginManagementService;
 import com.bankerarea.mapper.UserMapper;
 import com.bankerarea.test.TestVO;
 import com.bankerarea.vo.UserVO;
@@ -33,35 +36,42 @@ public class UserController {
 	@Autowired
 	JavaMailSender javaMailSender;
 	@Autowired
-	private JwtService jwtService;
+	private LoginManagementService loginManagementService;
 
-	@GetMapping("/account/token")
-	public UserVO token(UserVO vo, HttpServletResponse res,
+	@PostMapping("/signin")
+	public UserVO signin(UserVO vo, HttpServletResponse res,
 			HttpServletRequest req) throws Exception {
 		System.out.println(vo);
 		UserVO user = userMapper.signinUser(vo);
-		String accessKey = jwtService.makeJwt(vo);
+		String accessKey = loginManagementService.makeToken(vo.getId());
 		
 		Cookie cookie = new Cookie("accessKey",accessKey);
-		System.out.println(user + accessKey);
+		cookie.setPath("/");
+		cookie.setMaxAge(60*30);
+		
 		res.addCookie(cookie);
-		user.setAccessKey(accessKey);
 		
 		return user;
 	}
 	
+	@PostMapping("/authApi")
+	public ResponseEntity<Object> auth(@CookieValue(name="accessKey") String accessKey) throws Exception {
+		System.out.println("[인증완료] 사용 가능한 API 입니다.");
+		System.out.println("[accessKey] " + accessKey);
+		
+		return new ResponseEntity<Object>(HttpStatus.OK);
+	}
+	
+	@PostMapping("/signup")
+	public ResponseEntity<Object> signup() {
+		return new ResponseEntity<Object>(HttpStatus.OK);
+	}
+	
+	
 	@PostMapping("/account/signin")
 	public UserVO signinUser(@RequestBody UserVO vo, HttpServletResponse res) throws Exception {
 		System.out.println("/account/signin ==> " + vo.getId() + "로그인 처리");
-		
 		UserVO user = userMapper.signinUser(vo);
-		String accessKey = jwtService.makeJwt(vo);
-		
-		Cookie cookie = new Cookie("accessKey", accessKey);
-		cookie.setComment("이게 들어갔으면 좋겠네");
-		cookie.setPath("/");
-		cookie.setMaxAge(60*60*24);
-		res.addCookie(cookie);
 		
 		return user;
 	}
