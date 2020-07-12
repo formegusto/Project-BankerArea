@@ -45,6 +45,8 @@ public class UserController {
 		UserVO user = userMapper.signinUser(vo);
 		String accessKey = loginManagementService.makeToken(vo.getId());
 		
+		System.out.println(accessKey);
+		
 		Cookie cookie = new Cookie("accessKey",accessKey);
 		cookie.setPath("/");
 		cookie.setMaxAge(60*30);
@@ -72,6 +74,13 @@ public class UserController {
 	public UserVO signinUser(@RequestBody UserVO vo, HttpServletResponse res) throws Exception {
 		System.out.println("/account/signin ==> " + vo.getId() + "로그인 처리");
 		UserVO user = userMapper.signinUser(vo);
+		String accessKey = loginManagementService.makeToken(vo.getId());
+		
+		Cookie cookie = new Cookie("accessKey",accessKey);
+		cookie.setPath("/");
+		cookie.setMaxAge(60*30);
+		
+		res.addCookie(cookie);
 		
 		return user;
 	}

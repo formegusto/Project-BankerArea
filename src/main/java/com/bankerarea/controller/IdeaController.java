@@ -17,7 +17,7 @@ import com.bankerarea.vo.GoodsVO;
 import com.bankerarea.vo.IdeaVO;
 import com.bankerarea.vo.PurchaseVO;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "", maxAge = 3600, allowCredentials="true")
 @RestController
 @RequestMapping("/idea")
 public class IdeaController {
@@ -72,7 +72,7 @@ public class IdeaController {
 	}
 	
 	@PostMapping("/post")
-	public void postIdea(@RequestBody IdeaVO vo) {
+	public void post(@RequestBody IdeaVO vo) {
 		ideaMapper.insertIdea(vo);
 		int current_seq = ideaMapper.getCurrentIdea_seq();
 		vo.setIdea_seq(current_seq);

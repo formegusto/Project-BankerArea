@@ -1,10 +1,8 @@
 package com.bankerarea.common;
 
 import java.security.Key;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -22,7 +20,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Service
 public class LoginManagementService {
 	private String secretKey = "ThisisBankerSecretKeyByMKYHTH";
-	private List<String> login_user_list = new ArrayList<String>();
 	private Logger logger = LoggerFactory.getLogger(LoginManagementService.class);
 	
 	public LoginManagementService() {
@@ -30,18 +27,10 @@ public class LoginManagementService {
 		System.out.println("[Login Management Service] 생성 완료");
 	}
 	
-	public boolean isLogin(String id) {
-		return login_user_list.contains(id);
-	}
-	
-	public void addLoginUser(String id) {
-		login_user_list.add(id);
-	}
-	
 	public String makeToken(String id) throws Exception {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         Date expireTime = new Date();
-        expireTime.setTime(expireTime.getTime() + 1000 * 60 * 1);
+        expireTime.setTime(expireTime.getTime() + 1000 * 60 * 60);
         // expireTime.setTime(expireTime.getTime() + 1000 * 60 * 60 * 5);
         	// Token Time 5 Hours
         byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(secretKey);
