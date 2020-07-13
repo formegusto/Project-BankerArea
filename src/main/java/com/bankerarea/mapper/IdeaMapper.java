@@ -16,4 +16,8 @@ public interface IdeaMapper {
 	void insertIdea(IdeaVO vo);
 	void insertGoods(GoodsVO vo);
 	int getCurrentIdea_seq();
+	
+	// Update
+	void updateIdea(IdeaVO vo);
+	void updateGoods(GoodsVO vo);
 }

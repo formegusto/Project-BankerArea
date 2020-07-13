@@ -7,7 +7,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +39,12 @@ public class UserController {
 
 	@PostMapping("/signin")
 	public UserVO signin(UserVO vo, HttpServletResponse res,
-			HttpServletRequest req) throws Exception {
+			@CookieValue(name="accessKey") String accessCookie) throws Exception {
 		System.out.println(vo);
 		UserVO user = userMapper.signinUser(vo);
 		String accessKey = loginManagementService.makeToken(vo.getId());
-		
 		System.out.println(accessKey);
+		System.out.println(accessCookie);
 		
 		Cookie cookie = new Cookie("accessKey",accessKey);
 		cookie.setPath("/");
@@ -71,14 +70,17 @@ public class UserController {
 	
 	
 	@PostMapping("/account/signin")
-	public UserVO signinUser(@RequestBody UserVO vo, HttpServletResponse res) throws Exception {
+	public UserVO signinUser(@RequestBody UserVO vo, HttpServletResponse res,
+			@CookieValue(name = "accessKey", defaultValue = "null") String key) throws Exception {
 		System.out.println("/account/signin ==> " + vo.getId() + "로그인 처리");
+		System.out.println(key);
 		UserVO user = userMapper.signinUser(vo);
 		String accessKey = loginManagementService.makeToken(vo.getId());
 		
 		Cookie cookie = new Cookie("accessKey",accessKey);
 		cookie.setPath("/");
 		cookie.setMaxAge(60*30);
+		cookie.setHttpOnly(true);
 		
 		res.addCookie(cookie);
 		

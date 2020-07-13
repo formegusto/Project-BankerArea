@@ -34,5 +34,15 @@
 			SELECT MAX(IDEA_SEQ)
 			FROM IDEA
 		</select>
+		<update id="updateIdea" parameterType="com.bankerarea.vo.IdeaVO"> 
+			UPDATE IDEA 
+			SET project_name=#{project_name}, short_description=#{short_description}, category=#{category} 
+			WHERE idea_seq=#{idea_seq} 
+		</update>
+		<update id="updateGoods" parameterType="com.bankerarea.vo.GoodsVO"> 
+			UPDATE GOODS 
+			SET open_status=#{open_status}, content=#{content}, price=#{price} 
+			WHERE goods_seq=#{goods_seq}
+		</update>
 	</mapper>
 	

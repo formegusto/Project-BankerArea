@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +29,7 @@ public class IdeaController {
 	
 	@GetMapping("/list")
 	public List<IdeaVO> getIdeaList(
-			@CookieValue(name="accessKey",defaultValue = "안들어오는이유좀?") String key) {
+			@CookieValue(name="accessKey",defaultValue = "UnAuth") String key) {
 		System.out.println("/idea/list ==> 아이디어 리스트 조회 처리");
 		System.out.println(key);
 		
@@ -43,7 +44,7 @@ public class IdeaController {
 	
 	@GetMapping("/detail")
 	public IdeaVO getIdea(int idea_seq, String id) {
-		System.out.println("/idea/details ==> 아이디어 상세 조회 처리");
+		System.out.println("/idea/detail ==> 아이디어 상세 조회 처리");
 		// 아이디어 조회
 		IdeaVO idea = ideaMapper.getIdea(idea_seq);
 		
@@ -73,12 +74,23 @@ public class IdeaController {
 	
 	@PostMapping("/post")
 	public void post(@RequestBody IdeaVO vo) {
+		System.out.println("/idea/post ==> 아이디어 등록 처리");
 		ideaMapper.insertIdea(vo);
 		int current_seq = ideaMapper.getCurrentIdea_seq();
 		vo.setIdea_seq(current_seq);
 		for(GoodsVO goods : vo.getGoodsList()) {
 			goods.setIdea_seq(vo.getIdea_seq());
 			ideaMapper.insertGoods(goods);
+		}
+		System.out.println(vo.toString());
+	}
+	
+	@PatchMapping("/update")
+	public void update(@RequestBody IdeaVO vo) {
+		System.out.println("/idea/detail ==> 아이디어 수정 처리");
+		ideaMapper.updateIdea(vo);
+		for(GoodsVO goods : vo.getGoodsList()) {
+			ideaMapper.updateGoods(goods);
 		}
 		System.out.println(vo.toString());
 	}
