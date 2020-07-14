@@ -9,4 +9,8 @@
 			WHERE BUYER_ID=#{buyer_id}
 			AND GOODS_SEQ=#{goods_seq}
 		</select>
+		<insert id="insertPurchase" parameterType="com.bankerarea.vo.PurchaseVO"> 
+			INSERT INTO PURCHASE(buyer_id, goods_seq) 
+			VALUES(#{buyer_id}, #{goods_seq}) 
+		</insert>
 	</mapper>

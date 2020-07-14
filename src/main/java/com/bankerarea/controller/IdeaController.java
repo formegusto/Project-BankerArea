@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bankerarea.common.LoginManagementService;
 import com.bankerarea.mapper.IdeaMapper;
 import com.bankerarea.mapper.PurchaseMapper;
 import com.bankerarea.vo.GoodsVO;
@@ -26,6 +27,8 @@ public class IdeaController {
 	IdeaMapper ideaMapper;
 	@Autowired
 	PurchaseMapper purchaseMapper;
+	@Autowired
+	LoginManagementService loginManagementService;
 	
 	@GetMapping("/list")
 	public List<IdeaVO> getIdeaList(
@@ -93,5 +96,19 @@ public class IdeaController {
 			ideaMapper.updateGoods(goods);
 		}
 		System.out.println(vo.toString());
+	}
+	
+	@PostMapping("/purchase")
+	public void purchase(@RequestBody List<Integer> goodsSeqList, 
+			@CookieValue(name="accessKey", defaultValue = "unAuth") String accessKey) throws Exception {
+		String id = loginManagementService.getIdByToken(accessKey);
+		System.out.println(id + "<== 이 분이 구매하실 리스트 ==> " + goodsSeqList.toString());
+		for(int goods_seq : goodsSeqList) {
+			PurchaseVO pvo = new PurchaseVO();
+			pvo.setGoods_seq(goods_seq);
+			pvo.setBuyer_id(id);
+			
+			purchaseMapper.insertPurchase(pvo);
+		}
 	}
 }
