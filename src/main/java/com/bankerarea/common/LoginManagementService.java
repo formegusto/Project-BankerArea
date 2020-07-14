@@ -4,6 +4,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
@@ -98,4 +99,21 @@ public class LoginManagementService {
 		return result;
 	}
 	
+	public String numberGen(int len, int dupCd) {
+		Random rand = new Random();
+		String numStr = "";
+		for(int i=0;i<len;i++) {
+			String ran = Integer.toString(rand.nextInt(10));
+			if(dupCd==1) {
+				numStr += ran;
+			} else if(dupCd==2) {
+				if(!numStr.contains(ran)) {
+					numStr += ran;
+				} else {
+					i -= 1;
+				}
+			}
+		}
+		return numStr;
+	}
 }

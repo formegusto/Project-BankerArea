@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTDMapper3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.bankerarea.mapper.LikeyMapper">
+		<insert parameterType="com.bankerarea.vo.LikeyVO" id="insertLikey">
+			INSERT INTO LIKEY(id, idea_seq)
+			VALUES(#{id}, #{idea_seq}) 
+		</insert>
+		<delete parameterType="com.bankerarea.vo.LikeyVO" id="deleteLikey">
+			DELETE FROM LIKEY
+			WHERE id = #{id}
+			AND idea_seq = #{idea_seq} 
+		</delete>
+		<select parameterType="com.bankerarea.vo.LikeyVO" id="doYouLike" resultType="Integer">
+			SELECT likey_seq 
+			FROM LIKEY
+			WHERE id = #{id}
+			AND idea_seq = #{idea_seq} </select>
+	</mapper>

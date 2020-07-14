@@ -3,6 +3,11 @@
 	PUBLIC "-//mybatis.org//DTDMapper3.0//EN"
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 	<mapper namespace="com.bankerarea.mapper.IdeaMapper">
+		<update id="increaseReadCnt" parameterType="int">
+			UPDATE IDEA
+			SET READ_COUNT = READ_COUNT + 1
+			WHERE IDEA_SEQ = #{idea_seq}
+		</update>
 		<select id="getIdeaList" resultType="com.bankerarea.vo.IdeaVO">
 			SELECT *
 			FROM IDEA
@@ -44,5 +49,29 @@
 			SET open_status=#{open_status}, content=#{content}, price=#{price} 
 			WHERE goods_seq=#{goods_seq}
 		</update>
+		<select id="getYourLikeyList" parameterType="String" resultType="com.bankerarea.vo.IdeaVO">
+			SELECT IDEA.*FROM IDEA, LIKEY
+			WHERE IDEA.idea_seq=LIKEY.idea_seq
+			AND LIKEY.id = #{id} 
+		</select>
+		<select parameterType="String" id="getMyIdeaList" resultType="com.bankerarea.vo.IdeaVO">
+			SELECT *
+			FROM IDEA
+			WHERE banker_id=#{id} 
+		</select>
+		<select parameterType="com.bankerarea.vo.SearchVO" id="searchTypeIdeaList" resultType="com.bankerarea.vo.IdeaVO">
+			SELECT *
+			FROM IDEA 
+			<if test="type.equals('searchWord')">
+				WHERE project_name LIKE '%${keyword}%'
+				OR short_description LIKE '%${keyword}%' 
+			</if>
+			<if test="type.equals('category')">
+				WHERE category LIKE '%${keyword}%' 
+			</if>
+			<if test="type.equals('banker')">
+				WHERE banker_id LIKE '%${keyword}%' 
+			</if>
+		</select>
 	</mapper>
 	

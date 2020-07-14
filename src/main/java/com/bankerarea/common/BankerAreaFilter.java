@@ -24,8 +24,8 @@ import io.jsonwebtoken.JwtException;
 public class BankerAreaFilter implements Filter {
 	private List<String> unauth_allow_api = new ArrayList<String>(
 			Arrays.asList( 
-					"/users/account/signin" , "/users/account/signup" ,
-					"/users/account/logout" , "/idea/list"
+					"/users/account/signin" , "/users/account/signup" , "/users/account/signup/reqsecret" ,
+					"/users/account/logout" , "/idea/list" ,  "/idea/detail"
 				));
 	@Autowired
 	private LoginManagementService loginManagementService;

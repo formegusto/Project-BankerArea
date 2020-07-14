@@ -1,11 +1,17 @@
 package com.bankerarea.vo;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+
 import lombok.Data;
 
 @Data
 public class UserVO {
+	@NotNull
 	private String id;
+	@NotNull
 	private String password;
+	@NotNull @Email
 	private String email;
 	
 	public String getId() {

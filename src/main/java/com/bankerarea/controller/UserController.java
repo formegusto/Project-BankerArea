@@ -1,17 +1,15 @@
 package com.bankerarea.controller;
 
-import java.util.Date;
-
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bankerarea.common.LoginManagementService;
 import com.bankerarea.mapper.UserMapper;
-import com.bankerarea.test.TestVO;
 import com.bankerarea.vo.UserVO;
 
 @CrossOrigin(origins = "", maxAge = 3600, allowCredentials="true")
@@ -36,42 +33,10 @@ public class UserController {
 	JavaMailSender javaMailSender;
 	@Autowired
 	private LoginManagementService loginManagementService;
-
-	@PostMapping("/signin")
-	public UserVO signin(UserVO vo, HttpServletResponse res,
-			@CookieValue(name="accessKey") String accessCookie) throws Exception {
-		System.out.println(vo);
-		UserVO user = userMapper.signinUser(vo);
-		String accessKey = loginManagementService.makeToken(vo.getId());
-		System.out.println(accessKey);
-		System.out.println(accessCookie);
-		
-		Cookie cookie = new Cookie("accessKey",accessKey);
-		cookie.setPath("/");
-		cookie.setMaxAge(60*30);
-		
-		res.addCookie(cookie);
-		
-		return user;
-	}
-	
-	@PostMapping("/authApi")
-	public ResponseEntity<Object> auth(@CookieValue(name="accessKey") String accessKey) throws Exception {
-		System.out.println("[인증완료] 사용 가능한 API 입니다.");
-		System.out.println("[accessKey] " + accessKey);
-		
-		return new ResponseEntity<Object>(HttpStatus.OK);
-	}
-	
-	@PostMapping("/signup")
-	public ResponseEntity<Object> signup() {
-		return new ResponseEntity<Object>(HttpStatus.OK);
-	}
-	
 	
 	@PostMapping("/account/signin")
 	public UserVO signinUser(@RequestBody UserVO vo, HttpServletResponse res,
-			@CookieValue(name = "accessKey", defaultValue = "null") String key) throws Exception {
+			@CookieValue(name = "accessKey", defaultValue = "unAuth") String key) throws Exception {
 		System.out.println("/account/signin ==> " + vo.getId() + "로그인 처리");
 		System.out.println(key);
 		UserVO user = userMapper.signinUser(vo);
@@ -88,43 +53,46 @@ public class UserController {
 	}
 	
 	@PostMapping("/account/signup")
-	public UserVO signupUser(@RequestBody UserVO vo) {
+	public UserVO signupUser(@Valid @RequestBody UserVO vo) {
 		System.out.println("/account/signup ==> " + vo.getId() + "회원가입 처리");
 		userMapper.signupUser(vo);
 		return userMapper.signinUser(vo);
 	}
 	
 	@PostMapping("/account/signup/reqsecret")
-	public void reqSecretCode(@RequestBody UserVO user) throws MessagingException {
+	public String reqSecretCode(@Valid @RequestBody UserVO user) throws MessagingException {
 		System.out.println(user.getEmail());
-		MimeMessage message = javaMailSender.createMimeMessage();
-		message.setSubject("Hello, We Are BankerArea Team!");
-		message.setRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
-		message.setText("Ur Secret Code is 123456!! :)");
-		message.setSentDate(new Date());
-		javaMailSender.send(message);
+		String secretCode = loginManagementService.numberGen(6, 2);
+		MimeMessage msg = javaMailSender.createMimeMessage();
+		String message = "Hello! We Are BankerArea Team<br/>" +
+				"Ur Secret Code is " + secretCode + " :)<br/>" +
+				"Have A Nice Day! THX! :)";
+		msg.setContent(message, "text/html");
+		msg.setSubject("Hello, We Are BankerArea Team!");
+		msg.setRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
+		
+		javaMailSender.send(msg);
+		
+		return secretCode;
 	}
 	
-	/* Test Mapping */
-	@GetMapping("/test/returnUser")
-	public UserVO testReturnUser(){
-		UserVO uvo = new UserVO();
+	@GetMapping("/account/logout")
+	public void logoutUser(HttpServletRequest req, HttpServletResponse res) {
+		Cookie[] cookies = req.getCookies();
+		Cookie accessCookie = null;
 		
-		uvo.setId("userVO");
-		uvo.setPassword("12345678");
-		uvo.setEmail("user@userVO.com");
+		for(Cookie cookie : cookies) {
+			if(cookie.getName().equals("accessKey")) {
+				accessCookie = cookie;
+				break;
+			}
+		}
 		
-		return uvo;
+		accessCookie.setMaxAge(-1);
+		Cookie newAccessCookie = new Cookie("accessKey", "");
+		newAccessCookie.setMaxAge(0);
+		newAccessCookie.setPath("/");
+		newAccessCookie.setHttpOnly(true);
+		res.addCookie(newAccessCookie);
 	}
-	
-	@GetMapping("/test/returnTest")
-	public TestVO testReturnTest() {
-		TestVO tvo = new TestVO();
-		
-		tvo.setNum(1);
-		tvo.setStr("testVO");
-		
-		return tvo;
-	}
-	
 }
