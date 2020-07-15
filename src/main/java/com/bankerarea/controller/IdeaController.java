@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +38,7 @@ public class IdeaController {
 	@Autowired
 	LoginManagementService loginManagementService;
 	
+	/* 리스트 조회 관련 API */
 	@GetMapping("/list")
 	public List<IdeaVO> getIdeaList() {
 		System.out.println("/idea/list ==> 아이디어 리스트 조회 처리");
@@ -109,9 +111,9 @@ public class IdeaController {
 		if(!accessKey.equals("unAuth"))
 			id = loginManagementService.getIdByToken(accessKey);
 		
-		ideaMapper.increaseReadCnt(idea_seq);
 		// 아이디어 조회
 		IdeaVO idea = ideaMapper.getIdea(idea_seq);
+		ideaMapper.increaseReadCnt(idea_seq);
 		
 		// 굿즈 리스트 조회
 		List<GoodsVO> goodsList_ = ideaMapper.getGoodsList(idea_seq);
@@ -154,16 +156,7 @@ public class IdeaController {
 		return idea;
 	}
 	
-	@PatchMapping("/update")
-	public void update(@RequestBody IdeaVO vo) {
-		System.out.println("/idea/detail ==> 아이디어 수정 처리");
-		ideaMapper.updateIdea(vo);
-		for(GoodsVO goods : vo.getGoodsList()) {
-			ideaMapper.updateGoods(goods);
-		}
-		System.out.println(vo.toString());
-	}
-	
+	/* CUD 관련 API */
 	@PostMapping("/post")
 	public void post(@RequestBody IdeaVO vo, 
 			@CookieValue(name="accessKey", defaultValue="unAuth") String accessKey) throws Exception {
@@ -182,6 +175,45 @@ public class IdeaController {
 		}
 	}
 	
+	@PatchMapping("/update")
+	public void update(@RequestBody IdeaVO vo) {
+		System.out.println("/idea/detail ==> 아이디어 수정 처리");
+		ideaMapper.updateIdea(vo);
+		for(GoodsVO goods : vo.getGoodsList()) {
+			ideaMapper.updateGoods(goods);
+		}
+		System.out.println(vo.toString());
+	}
+	
+	@DeleteMapping("/delete")
+	public void delete(@RequestBody IdeaVO vo, HttpServletResponse res,
+			@CookieValue(name="accessKey", defaultValue="unAuth") String accessKey) throws Exception {
+		System.out.println("/idea/delete ==> 아이디어 삭제 처리");
+		IdeaVO idea = ideaMapper.getIdea(vo.getIdea_seq());
+		
+		/* 사용자 권한 체크 */
+		String id = "unAuth";
+		if(!accessKey.equals("unAuth"))
+			id = loginManagementService.getIdByToken(accessKey);
+		
+		if(id.equals("unAuth") || !idea.getBanker_id().equals(id)) {
+			res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		} else {
+			/* 영한이가 만들어 준 SQL 실행 */
+			// IdeaVO delIdea = ideaMapper.영한이 함수()
+			Integer idea_seq = purchaseMapper.isThisSoldIdea(vo.getIdea_seq());
+			if(idea_seq != null) {
+				// 값이 있으면 ( 지우면 안됨! )
+				res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			} else {
+				// 값이 없으면 ( 지우기! )
+				ideaMapper.deleteIdea(vo.getIdea_seq());
+			}
+		}
+	}
+	
+	
+	/*구매 관련 API */
 	@PostMapping("/purchase")
 	public void purchase(@RequestBody List<Integer> goodsSeqList, 
 			@CookieValue(name="accessKey", defaultValue = "unAuth") String accessKey) throws Exception {
@@ -196,6 +228,7 @@ public class IdeaController {
 		}
 	}
 	
+	/* 좋아요 관련 API */
 	@PostMapping("/likey")
 	public void likey(@RequestBody LikeyVO vo, HttpServletResponse res,
 			@CookieValue(name="accessKey", defaultValue = "unAuth") String accessKey) throws Exception {

@@ -35,21 +35,25 @@ public class UserController {
 	private LoginManagementService loginManagementService;
 	
 	@PostMapping("/account/signin")
-	public UserVO signinUser(@RequestBody UserVO vo, HttpServletResponse res,
+	public String signinUser(@RequestBody UserVO vo, HttpServletResponse res,
 			@CookieValue(name = "accessKey", defaultValue = "unAuth") String key) throws Exception {
 		System.out.println("/account/signin ==> " + vo.getId() + "로그인 처리");
 		System.out.println(key);
 		UserVO user = userMapper.signinUser(vo);
 		String accessKey = loginManagementService.makeToken(vo.getId());
 		
-		Cookie cookie = new Cookie("accessKey",accessKey);
-		cookie.setPath("/");
-		cookie.setMaxAge(60*30);
-		cookie.setHttpOnly(true);
-		
-		res.addCookie(cookie);
-		
-		return user;
+		if(user == null) {
+			res.setStatus(HttpServletResponse.SC_NON_AUTHORITATIVE_INFORMATION);
+			return null;
+		} else {
+			Cookie cookie = new Cookie("accessKey",accessKey);
+			cookie.setPath("/");
+			cookie.setMaxAge(60*30);
+			cookie.setHttpOnly(true);
+			
+			res.addCookie(cookie);
+			return user.getId();
+		}
 	}
 	
 	@PostMapping("/account/signup")

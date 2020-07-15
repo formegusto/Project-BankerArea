@@ -13,4 +13,9 @@
 			INSERT INTO PURCHASE(buyer_id, goods_seq) 
 			VALUES(#{buyer_id}, #{goods_seq}) 
 		</insert>
+		<select id="isThisSoldIdea" resultType="Integer" parameterType="int">
+			SELECT DISTINCT(idea_seq) FROM PURCHASE, GOODS
+			WHERE PURCHASE.goods_seq = GOODS.goods_seq
+			AND idea_seq = #{idea_seq}
+		</select>
 	</mapper>

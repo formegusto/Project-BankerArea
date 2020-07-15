@@ -73,5 +73,9 @@
 				WHERE banker_id LIKE '%${keyword}%' 
 			</if>
 		</select>
+		<delete id="deleteIdea" parameterType="int">
+			DELETE FROM IDEA
+			WHERE IDEA_SEQ = #{idea_seq}
+		</delete>
 	</mapper>
 	

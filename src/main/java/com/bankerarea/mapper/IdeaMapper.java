@@ -26,4 +26,5 @@ public interface IdeaMapper {
 	void updateIdea(IdeaVO vo);
 	void updateGoods(GoodsVO vo);
 	void increaseReadCnt(int idea_seq);
+	void deleteIdea(int idea_seq);
 }

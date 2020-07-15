@@ -8,4 +8,5 @@ import com.bankerarea.vo.PurchaseVO;
 public interface PurchaseMapper {
 	PurchaseVO getPurchase(PurchaseVO vo);
 	void insertPurchase(PurchaseVO vo);
+	Integer isThisSoldIdea(int idea_seq);
 }
