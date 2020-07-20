@@ -86,6 +86,7 @@ public class IdeaController {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return null;
 		}
+		
 		List<IdeaVO> ideaList = ideaMapper.getMyIdeaList(id);
 		for(int i=0;i<ideaList.size();i++) {
 			IdeaVO idea = ideaList.get(i);
@@ -116,23 +117,22 @@ public class IdeaController {
 		ideaMapper.increaseReadCnt(idea_seq);
 		
 		// 굿즈 리스트 조회
-		List<GoodsVO> goodsList_ = ideaMapper.getGoodsList(idea_seq);
-		GoodsVO[] goodsList = goodsList_.toArray(new GoodsVO[goodsList_.size()]);
+		List<GoodsVO> goodsList = ideaMapper.getGoodsList(idea_seq);
 		
 		// 사용자별 공개여부 설정
 		if(id.equals("unAuth")) {
-			for(int i = 0; i< goodsList.length; ++i)
-				goodsList[i].setOpen_status(0);
+			for(int i = 0; i< goodsList.size(); ++i)
+				goodsList.get(i).setOpen_status(0);
 		} else if(id.equals(idea.getBanker_id())) {
-			for(int i = 0; i< goodsList.length; ++i)
-				goodsList[i].setOpen_status(1);
+			for(int i = 0; i< goodsList.size(); ++i)
+				goodsList.get(i).setOpen_status(1);
 		} else{
 			PurchaseVO purchaseVO = new PurchaseVO();
 			purchaseVO.setBuyer_id(id);
-			for(int i = 0; i< goodsList.length; i++) {
-				purchaseVO.setGoods_seq(goodsList[i].getGoods_seq());
+			for(int i = 0; i< goodsList.size(); i++) {
+				purchaseVO.setGoods_seq(goodsList.get(i).getGoods_seq());
 				if(purchaseMapper.getPurchase(purchaseVO) != null) 
-					goodsList[i].setOpen_status(1);
+					goodsList.get(i).setOpen_status(1);
 			}	
 		}
 		idea.setGoodsList(goodsList);
@@ -140,38 +140,54 @@ public class IdeaController {
 		return idea;
 	}
 	
+	/*
 	@GetMapping("/detailUp")
-	public IdeaVO getIdeaUp(int idea_seq) {
+	public IdeaVO getIdeaUp(int idea_seq, HttpServletResponse res,
+			@CookieValue(name="accessKey", defaultValue="unAuth") String accessKey) throws Exception {
 		System.out.println("/idea/detailUp ==> 아이디어 상세 조회 처리");
+		// 사용자 id 설정
+				String id = "unAuth";
+				if(!accessKey.equals("unAuth"))
+					id = loginManagementService.getIdByToken(accessKey);
 		
 		// 아이디어 조회
 		IdeaVO idea = ideaMapper.getIdea(idea_seq);
 		
-		// 굿즈 리스트 조회
-		List<GoodsVO> goodsList_ = ideaMapper.getGoodsList(idea_seq);
-		GoodsVO[] goodsList = goodsList_.toArray(new GoodsVO[goodsList_.size()]);
-		
-		idea.setGoodsList(goodsList);
+		// 권한이 없는
+		if(idea.getBanker_id().equals(id) && !(id.equals("unAuth"))){
+			// 굿즈 리스트 조회
+			List<GoodsVO> goodsList_ = ideaMapper.getGoodsList(idea_seq);
+			GoodsVO[] goodsList = goodsList_.toArray(new GoodsVO[goodsList_.size()]);
+			
+			idea.setGoodsList(goodsList);
+		} else {
+			res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			idea = null;
+		}
 		
 		return idea;
 	}
-	
+	*/
 	/* CUD 관련 API */
 	@PostMapping("/post")
-	public void post(@RequestBody IdeaVO vo, 
+	public void post(@RequestBody IdeaVO vo, HttpServletResponse res,
 			@CookieValue(name="accessKey", defaultValue="unAuth") String accessKey) throws Exception {
 		System.out.println("/idea/post ==> 아이디어 등록 처리");
 		
-		String id = loginManagementService.getIdByToken(accessKey);
-		vo.setBanker_id(id);
-		ideaMapper.insertIdea(vo);
-		
-		int current_seq = ideaMapper.getCurrentIdea_seq();
-		vo.setIdea_seq(current_seq);
-		
-		for(GoodsVO goods : vo.getGoodsList()) {
-			goods.setIdea_seq(vo.getIdea_seq());
-			ideaMapper.insertGoods(goods);
+		if(accessKey.equals("unAuth")) {
+			res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		} else {
+			String id = loginManagementService.getIdByToken(accessKey);
+			vo.setBanker_id(id);
+			ideaMapper.insertIdea(vo);
+			
+			int current_seq = ideaMapper.getCurrentIdea_seq();
+			vo.setIdea_seq(current_seq);
+			
+			for(GoodsVO goods : vo.getGoodsList()) {
+				goods.setIdea_seq(vo.getIdea_seq());
+				ideaMapper.insertGoods(goods);
+			}
 		}
 	}
 	

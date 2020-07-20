@@ -57,10 +57,16 @@ public class UserController {
 	}
 	
 	@PostMapping("/account/signup")
-	public UserVO signupUser(@Valid @RequestBody UserVO vo) {
+	public UserVO signupUser(@Valid @RequestBody UserVO vo,HttpServletResponse res) {
 		System.out.println("/account/signup ==> " + vo.getId() + "회원가입 처리");
-		userMapper.signupUser(vo);
-		return userMapper.signinUser(vo);
+		
+		if(vo.getId().equals("unAuth")) {
+			res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return null;
+		} else {
+			userMapper.signupUser(vo);
+			return userMapper.signinUser(vo);
+		}
 	}
 	
 	@PostMapping("/account/signup/reqsecret")

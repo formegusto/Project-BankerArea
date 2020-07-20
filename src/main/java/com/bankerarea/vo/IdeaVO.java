@@ -1,6 +1,6 @@
 package com.bankerarea.vo;
 
-import java.util.Arrays;
+import java.util.List;
 
 import lombok.Data;
 
@@ -12,7 +12,7 @@ public class IdeaVO {
 	private String category;
 	private String read_count;
 	private String banker_id;
-	private GoodsVO[] goodsList;
+	private List<GoodsVO> goodsList;
 	private int likey_count;
 	public int getIdea_seq() {
 		return idea_seq;
@@ -50,10 +50,10 @@ public class IdeaVO {
 	public void setBanker_id(String banker_id) {
 		this.banker_id = banker_id;
 	}
-	public GoodsVO[] getGoodsList() {
+	public List<GoodsVO> getGoodsList() {
 		return goodsList;
 	}
-	public void setGoodsList(GoodsVO[] goodsList) {
+	public void setGoodsList(List<GoodsVO> goodsList) {
 		this.goodsList = goodsList;
 	}
 	public int getLikey_count() {
@@ -67,6 +67,6 @@ public class IdeaVO {
 	public String toString() {
 		return "IdeaVO [idea_seq=" + idea_seq + ", project_name=" + project_name + ", short_description="
 				+ short_description + ", category=" + category + ", read_count=" + read_count + ", banker_id="
-				+ banker_id + ", goodsList=" + Arrays.toString(goodsList) + ", likey_count=" + likey_count + "]";
+				+ banker_id + ", goodsList=" + goodsList + ", likey_count=" + likey_count + "]";
 	}
 }

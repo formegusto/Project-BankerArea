@@ -25,7 +25,8 @@ public class BankerAreaFilter implements Filter {
 	private List<String> unauth_allow_api = new ArrayList<String>(
 			Arrays.asList( 
 					"/users/account/signin" , "/users/account/signup" , "/users/account/signup/reqsecret" ,
-					"/users/account/logout" , "/idea/list" ,  "/idea/detail"
+					"/users/account/logout" , "/idea/list" ,  "/idea/detail" , "/idea/list/search", "/kakaoPay",
+					"/kakaoPaySuccess", "/pay"
 				));
 	@Autowired
 	private LoginManagementService loginManagementService;
@@ -38,12 +39,14 @@ public class BankerAreaFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		System.out.println("필터");
+		
 		HttpServletResponse res = (HttpServletResponse) response;
 		HttpServletRequest req= (HttpServletRequest) request;
 		String URI = req.getRequestURI();
 		String method = req.getMethod();
 		System.out.println(req.getMethod());
-		
+	
 		res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
 		res.setHeader("Access-Control-Allow-Credentials", "true");
 		res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE, PATCH");
